@@ -1,0 +1,315 @@
+﻿@model SirmaTask.Models.EmployeePairAnalysisResult
+
+@{
+    ViewData["Title"] = "Employee Pair Analyzer";
+
+    int totalDays = 0;
+
+    foreach (var result in Model.Results)
+    {
+        totalDays += result.DaysWorked;
+    }
+}
+
+<div class="container analyzer-container">
+
+    <div class="page-header">
+
+        <div>
+            <div class="page-eyebrow">
+                EMPLOYEE COLLABORATION
+            </div>
+
+            <h1>
+                Employee Pair Analyzer
+            </h1>
+
+            <p>
+                Analyze project history and find the employees
+                with the longest collaboration period.
+            </p>
+        </div>
+
+        <div class="page-status">
+            <span class="status-dot"></span>
+            CSV Analyzer
+        </div>
+
+    </div>
+
+
+    <div class="upload-panel">
+
+        <div class="upload-panel-left">
+
+            <div class="upload-icon-box">
+                CSV
+            </div>
+
+            <div>
+                <h4>
+                    Upload project data
+                </h4>
+
+                <p>
+                    Expected columns:
+                    <strong>EmpID</strong>,
+                    <strong>ProjectID</strong>,
+                    <strong>DateFrom</strong>,
+                    <strong>DateTo</strong>
+                </p>
+            </div>
+
+        </div>
+
+
+        <form asp-controller="Employees"
+              asp-action="Analyze"
+              method="post"
+              enctype="multipart/form-data"
+              class="upload-form">
+
+            <div class="file-picker">
+
+                <input type="file"
+                       id="csvFile"
+                       name="csvFile"
+                       accept=".csv"
+                       class="d-none" />
+
+                <label for="csvFile"
+                       class="file-picker-button">
+                    Choose CSV
+                </label>
+
+                <span id="selectedFileName"
+                      class="file-picker-name">
+                    No file selected
+                </span>
+
+            </div>
+
+            <button type="submit"
+                    class="btn analyze-btn">
+
+                Analyze CSV
+
+                <span class="analyze-arrow">
+                    →
+                </span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    @if (Model.Errors.Count > 0)
+    {
+        <div class="error-panel">
+
+            <div class="error-symbol">
+                !
+            </div>
+
+            <div>
+
+                <h5>
+                    Analysis failed
+                </h5>
+
+                @foreach (string error in Model.Errors)
+                {
+                    <div class="error-message">
+                        @error
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+
+    @if (Model.Results.Count > 0)
+    {
+        <div class="results-header">
+
+            <div>
+
+                <div class="page-eyebrow">
+                    RESULT
+                </div>
+
+                <h2>
+                    Best Employee Pair
+                </h2>
+
+            </div>
+
+            <span class="analysis-success">
+                Analysis completed
+            </span>
+
+        </div>
+
+
+        <div class="summary-grid">
+
+            <div class="summary-card blue-card">
+
+                <div class="summary-top">
+                    <span>Employee #1</span>
+                </div>
+
+                <div class="summary-value">
+                    @Model.Results[0].EmployeeId1
+                </div>
+
+                <div class="summary-bottom">
+                    Employee ID
+                </div>
+
+            </div>
+
+
+            <div class="summary-card purple-card">
+
+                <div class="summary-top">
+                    <span>Employee #2</span>
+                </div>
+
+                <div class="summary-value">
+                    @Model.Results[0].EmployeeId2
+                </div>
+
+                <div class="summary-bottom">
+                    Employee ID
+                </div>
+
+            </div>
+
+
+            <div class="summary-card green-card">
+
+                <div class="summary-top">
+                    <span>Collaboration</span>
+                </div>
+
+                <div class="summary-value">
+                    @totalDays
+                </div>
+
+                <div class="summary-bottom">
+                    Total days together
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="projects-panel">
+
+            <div class="projects-panel-header">
+
+                <div>
+
+                    <h3>
+                        Common Projects
+                    </h3>
+
+                    <p>
+                        Detailed collaboration breakdown
+                    </p>
+
+                </div>
+
+                <span class="project-counter">
+                    @Model.Results.Count projects
+                </span>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="analysis-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>EMPLOYEE #1</th>
+                            <th>EMPLOYEE #2</th>
+                            <th>PROJECT</th>
+                            <th>DAYS WORKED</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var result in Model.Results)
+                        {
+                            <tr>
+
+                                <td>
+                                    <span class="employee-chip employee-one">
+                                        @result.EmployeeId1
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="employee-chip employee-two">
+                                        @result.EmployeeId2
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="project-chip">
+                                        #@result.ProjectId
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="days-value">
+                                        @result.DaysWorked
+                                    </span>
+
+                                    <span class="days-label">
+                                        days
+                                    </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr>
+
+                            <td colspan="3">
+                                Total collaboration
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @totalDays days
+                                </strong>
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+</div>
